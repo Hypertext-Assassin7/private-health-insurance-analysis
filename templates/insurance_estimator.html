@@ -114,12 +114,16 @@
             </select>
           </div>  
 
-          <button class="btn btn-primary" type="submit" value="Submit" type="button" onclick="showValue()">Submit</button>
+          <button class="btn btn-primary" type="submit" value="Submit" type="button">Submit</button>
         </form>
       </div>
+
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.5.0/d3.min.js"></script>
+      <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   
       <div class="col">
         <div class="p-3"><h2>Estimate Results<h2></div>
+        <script src="{{ url_for('static', filename='js/app_analysis.js') }}"></script>
       </div>
     </div>
   </div>
