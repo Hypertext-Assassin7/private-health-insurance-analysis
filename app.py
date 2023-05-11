@@ -28,13 +28,14 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-class client_info(db.Model):
+class client(db.Model):
     __tablename__ = 'clients'
 
     id = db.Column(db.Integer, primary_key=True)
     insurance_basic = db.Column(db.Float)
     insurance_standard = db.Column(db.Float)
     insurance_premium = db.Column(db.Float)
+    insurance_option = db.Column(db.Float)
 
     def __repr__(self):
         return '<client %r>' % (self.name)
@@ -113,39 +114,38 @@ def estimator():
         coverage_level_Standard = 1 if coverage_level == "Standard" else 0
         coverage_level_Basic = 1 if coverage_level == "Basic" else 0
 
-        client_data_list_Basic = [client_age, bmi, children_no, gender_female, gender_male, smoker_no, smoker_yes, region_northeast, region_northwest, region_southeast, region_southwest,\
+        client_data_list_Basic= [client_age, bmi, children_no, gender_female, gender_male, smoker_no, smoker_yes, region_northeast, region_northwest, region_southeast, region_southwest,\
                                     medical_history_Diabetes, medical_history_Heart_disease, medical_history_High_blood_pressure, medical_history_None, family_medical_history_Diabetes, \
                                     family_medical_history_Heart_disease, family_medical_history_High_blood_pressure, family_medical_history_None, exercise_frequency_Frequently, \
                                     exercise_frequency_Never, exercise_frequency_Occasionally, exercise_frequency_Rarely, occupation_Blue_collar, occupation_Student, occupation_Unemployed, \
                                     occupation_White_collar, 1, 0, 0]
-
-        client_data_list_Standard = [client_age, bmi, children_no, gender_female, gender_male, smoker_no, smoker_yes, region_northeast, region_northwest, region_southeast, region_southwest,\
+        
+        client_data_list_Standard= [client_age, bmi, children_no, gender_female, gender_male, smoker_no, smoker_yes, region_northeast, region_northwest, region_southeast, region_southwest,\
                                     medical_history_Diabetes, medical_history_Heart_disease, medical_history_High_blood_pressure, medical_history_None, family_medical_history_Diabetes, \
                                     family_medical_history_Heart_disease, family_medical_history_High_blood_pressure, family_medical_history_None, exercise_frequency_Frequently, \
                                     exercise_frequency_Never, exercise_frequency_Occasionally, exercise_frequency_Rarely, occupation_Blue_collar, occupation_Student, occupation_Unemployed, \
                                     occupation_White_collar, 0, 0, 1]
-
-        client_data_list_Premium = [client_age, bmi, children_no, gender_female, gender_male, smoker_no, smoker_yes, region_northeast, region_northwest, region_southeast, region_southwest,\
+        
+        client_data_list_Premium= [client_age, bmi, children_no, gender_female, gender_male, smoker_no, smoker_yes, region_northeast, region_northwest, region_southeast, region_southwest,\
                                     medical_history_Diabetes, medical_history_Heart_disease, medical_history_High_blood_pressure, medical_history_None, family_medical_history_Diabetes, \
                                     family_medical_history_Heart_disease, family_medical_history_High_blood_pressure, family_medical_history_None, exercise_frequency_Frequently, \
                                     exercise_frequency_Never, exercise_frequency_Occasionally, exercise_frequency_Rarely, occupation_Blue_collar, occupation_Student, occupation_Unemployed, \
                                     occupation_White_collar, 0, 1, 0]
-        
-        # client_data_List = ([client_age, bmi, children_no, gender_female, gender_male, smoker_no, smoker_yes, region_northeast, region_northwest, region_southeast, region_southwest,\
-                                    # medical_history_Diabetes, medical_history_Heart_disease, medical_history_High_blood_pressure, medical_history_None, family_medical_history_Diabetes, \
-                                    # family_medical_history_Heart_disease, family_medical_history_High_blood_pressure, family_medical_history_None, exercise_frequency_Frequently, \
-                                    # exercise_frequency_Never, exercise_frequency_Occasionally, exercise_frequency_Rarely, occupation_Blue_collar, occupation_Student, occupation_Unemployed, \
-                                    # occupation_White_collar], [1, 0, 0], [0, 0, 1], [0, 1, 0])
-        
-        # client_data_List_basic_plan = (client_data_List[0], client_data_List[1])
-        
+
+        client_data_list_Option = [client_age, bmi, children_no, gender_female, gender_male, smoker_no, smoker_yes, region_northeast, region_northwest, region_southeast, region_southwest,\
+                                    medical_history_Diabetes, medical_history_Heart_disease, medical_history_High_blood_pressure, medical_history_None, family_medical_history_Diabetes, \
+                                    family_medical_history_Heart_disease, family_medical_history_High_blood_pressure, family_medical_history_None, exercise_frequency_Frequently, \
+                                    exercise_frequency_Never, exercise_frequency_Occasionally, exercise_frequency_Rarely, occupation_Blue_collar, occupation_Student, occupation_Unemployed, \
+                                    occupation_White_collar, coverage_level_Basic, coverage_level_Standard, coverage_level_Premium]
+   
         index1 = model.predict([client_data_list_Basic])
         index2 = model.predict([client_data_list_Standard])
         index3 = model.predict([client_data_list_Premium])
+        index4 = model.predict([client_data_list_Option])
         
         # response = jsonify(f"Predicted Insurance Basic: {index1}, Predicted Insurance Standard: {index2}, Predicted Insurance Premium:{index3}")
 
-        client_insurance = client_info(insurance_basic=index1, insurance_standard=index2, insurance_premium=index3)
+        client_insurance = client(insurance_basic=index1, insurance_standard=index2, insurance_premium=index3, insurance_option=index4)
 
         db.session.add(client_insurance)
         db.session.commit()
@@ -159,15 +159,16 @@ def estimator():
 @app.route("/analysis")
 def analysis():
 
-    insurance_results = db.session.query(client_info.insurance_basic, client_info.insurance_standard, client_info.insurance_premium).all()
+    insurance_results = db.session.query(client.insurance_basic, client.insurance_standard, client.insurance_premium, client.insurance_option).all()
 
      # Create a dictionary from the row data and append to a list
     insurance_basic = [result[0] for result in insurance_results]
     insurance_standard = [result[1] for result in insurance_results]
     insurance_premium = [result[2] for result in insurance_results]
+    insurance_option = [result[3] for result in insurance_results]
     data_length = len(insurance_results)-1
 
-    insurance_data = [{'Basic': insurance_basic[data_length], 'Standard': insurance_standard[data_length], 'Premium': insurance_premium[data_length]}]
+    insurance_data = [{'Basic': insurance_basic[data_length], 'Standard': insurance_standard[data_length], 'Premium': insurance_premium[data_length], 'Client_option': insurance_option[data_length]}]
 
     response = jsonify(insurance_data)
     # jsonify(f"Predicted Insurance Basic: {response[0]}, Predicted Insurance Standard: {response[1]}, Predicted Insurance Premium:{response[2]}")

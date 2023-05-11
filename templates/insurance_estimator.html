@@ -122,11 +122,34 @@
       <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   
       <div class="col">
-        <div class="p-3"><h2>Estimate Results<h2></div>
-        <script src="{{ url_for('static', filename='js/app_analysis.js') }}"></script>
+        <div class="p-3"><h2>Insurance Cover<h2></div>
+        <div class="card">
+          <p> </p>
+          <h2><a href="premium.html">Premium</a></h2>
+          <p><i>This is the perfect choice if you want to live like a boss, with the peace of mind that comes with knowing you're always covered!</i></p>
+          <p> </p>
+        </div>
+      <div class="card">
+          <p> </p>
+          <h2><a href="standard.html">Standard</a></h2>
+          <p><i>This is the perfect choice if you want to feel like a hero without breaking the bank!</i></p>
+          <p> </p>
+      </div>
+      <div class="card">
+          <p> </p>
+          <h2><a href="basic.html">Basic</a></h2>
+          <p><i>This is the perfect choice if you're on a tight budget and want to have some level of coverage, without having to sell your soul to the insurance company!</i></p>
+          <p> </p>
+      </div>
+        <div class="card">
+        <img src="{{ url_for('estimator', filename='./Resources/banner.jpg') }}" class="card-img-top">
+        <p> </p>
+    </div>
       </div>
     </div>
   </div>
+    
+</div>
 
   </body>
 </html>

@@ -6,6 +6,11 @@ d3.json(url).then (function(response){
 
           console.log (response)
 
+          // get prediction result based on clients' insurance cover option
+          let ClientValue = [response[0].Client_option]
+
+          document.getElementById("Predict").innerHTML = 'Your estimate insurance price is ' + ClientValue + ' per year.';
+
           // chart init
           let xValue = ['Basic', 'Standard', 'Premium'];
         
