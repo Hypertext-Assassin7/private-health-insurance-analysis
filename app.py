@@ -12,7 +12,7 @@ from flask import (
     redirect)
 
 # Flask setup
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static')
 
 #################################################
 # Database Setup
@@ -55,7 +55,19 @@ model = load(model_path)
 # create route that renders index.html template
 @app.route("/")
 def home():
-    return render_template("homepage.html")
+    return render_template("index.html")
+
+@app.route("/index")
+def index():
+    return render_template("index.html")
+
+@app.route("/about")
+def about():
+    return render_template("about.html")
+
+@app.route("/contact")
+def contact():
+    return render_template("contact_us.html")
 
 @app.route("/estimator", methods = ['GET','POST'])
 def estimator(): 
