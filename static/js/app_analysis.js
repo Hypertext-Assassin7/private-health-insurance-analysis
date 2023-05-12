@@ -15,7 +15,14 @@ d3.json(url).then (function(response){
           let xValue = ['Basic', 'Standard', 'Premium'];
         
           let yValue = [response[0].Basic, response[0].Standard, response[0].Premium]
-          console.log(yValue)
+          let color_list = ['rgb(52, 83, 168)', 'rgb(52, 83, 168)', 'rgb(52, 83, 168)']
+          console.log(yValue,color_list)
+
+          for (let i = 0; i< yValue.length; i++) {
+            if (yValue[i] == ClientValue) {
+              color_list[i] = 'rgb(52, 168, 53)';
+            }
+          }
           
           // Create a trace for the bar chart
           let trace = {
@@ -23,7 +30,7 @@ d3.json(url).then (function(response){
             y: yValue,
             type: 'bar',
             marker: {
-              color: 'rgb(52, 168, 83)' // Set the color of the bars
+              color: color_list // Set the color of the bars
             }
           };
           
@@ -33,7 +40,7 @@ d3.json(url).then (function(response){
             xaxis: {
               title: 'Insurance Plan',
               tickfont: {
-                size: 14,
+                size: 20,
                 color: 'rgb(107, 107, 107)'
               }
             },
