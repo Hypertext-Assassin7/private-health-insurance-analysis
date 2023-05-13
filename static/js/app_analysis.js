@@ -8,22 +8,32 @@ d3.json(url).then (function(response){
 
           // get prediction result based on clients' insurance cover option
           let ClientValue = [response[0].Client_option]
+          console.log(ClientValue)
 
-          document.getElementById("Predict").innerHTML = 'Your estimate insurance price is ' + ClientValue + ' per year.';
+          document.getElementById("Predict").innerHTML = 'You choose '+ client_cover + 'The estimate insurance price is ' + ClientValue + ' per year.';
 
           // chart init
           let xValue = ['Basic', 'Standard', 'Premium'];
         
           let yValue = [response[0].Basic, response[0].Standard, response[0].Premium]
+          console.log(yValue)
+
           let color_list = ['rgb(52, 83, 168)', 'rgb(52, 83, 168)', 'rgb(52, 83, 168)']
+          var client_cover
+
           console.log(yValue,color_list)
 
           for (let i = 0; i< yValue.length; i++) {
             if (yValue[i] == ClientValue) {
               color_list[i] = 'rgb(52, 168, 53)';
+              client_cover = xValue[i]
+              console.log(client_cover)
             }
           }
           
+          document.getElementById("Predict").innerHTML = 'You choose '+ client_cover + 
+                                  'The estimate insurance price is ' + ClientValue + ' per year.';
+
           // Create a trace for the bar chart
           let trace = {
             x: xValue,
