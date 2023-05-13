@@ -32,6 +32,17 @@ class client(db.Model):
     __tablename__ = 'clients'
 
     id = db.Column(db.Integer, primary_key=True)
+    insurance_age = db.Column(db.Integer)
+    insurance_bmi = db.Column(db.Integer)
+    insurance_children_no = db.Column(db.Integer)
+    insurance_gender = db.Column(db.String(20))
+    insurance_smoker = db.Column(db.String(20))
+    insurance_region = db.Column(db.String(20))
+    insurance_medical_history = db.Column(db.String(20))
+    insurance_family_medical_history = db.Column(db.String(20))
+    insurance_exercise_frequency = db.Column(db.String(20))
+    insurance_occupation = db.Column(db.String(20))
+    insurance_coverage_level = db.Column(db.String(20))
     insurance_basic = db.Column(db.Float)
     insurance_standard = db.Column(db.Float)
     insurance_premium = db.Column(db.Float)
@@ -69,17 +80,21 @@ def about():
 def contact():
     return render_template("contact_us.html")
 
+@app.route("/cover_options")
+def cover_option():
+    return render_template("cover_options.html")
+
 @app.route("/estimator", methods = ['GET','POST'])
 def estimator(): 
     if request.method == 'POST':
         estimate = []
 
-        #create library of all categories
+        #Create a list of categorical form answers that will be entered into estimate/prediction
         library = {'gender': ['Female', 'Male'], 'smoker': ['No', 'Yes'], 'region': ['Northeast', 'Northwest','Southeast', 'Southwest'], 'medical_history': ['Diabetes', 'Heart disease', 'High blood pressure', 'None'], 'family_medical_history': ['Diabetes', 'Heart disease', 'High blood pressure', 'None'], 'exercise_frequency': ['Frequently', 'Never', 'Occasionally', 'Rarely'], 'occupation': ['Blue collar', 'Student', 'Unemployed', 'White collar'], 'coverage_level': ['Basic', 'Premium', 'Standard']}
         #identify  the original column headers (also in library - used for lookup
         column = ['gender','smoker', 'region', 'medical_history', 'family_medical_history', 'exercise_frequency', 'occupation', 'coverage_level']
     
-        #retrieve dta from html form
+        #retrieve data from html form
         client_age = request.form['client_age']
         bmi = request.form['bmi']
         children_no = request.form['children_no']
@@ -95,12 +110,12 @@ def estimator():
         #Create a list of categorical form answers
         form_input = [gender, smoker, region, medical_history, family_medical_history, exercise_frequency, occupation, coverage_level]
         
-        #enter  numerical values for prediction
+        #enter numerical values for estimate/prediction
         estimate.append(client_age)
         estimate.append(bmi)
         estimate.append(children_no)
         
-        #create numerical values for categories for prediction
+        #create numerical values (get_dummies) for categories for estimate/prediction
         for j in range(len(column)):
             item = column[j]
             temp = []
@@ -110,7 +125,8 @@ def estimator():
                 if library[item][i] == form_input[j]:
                     temp[i] = 1
             estimate.extend(temp)
-     
+        
+        # Create corrections for all 3 price options and customer chosen option
         client_data_list_Basic=estimate.copy()
         client_data_list_Basic[27:30]=[1, 0, 0]
             
@@ -121,14 +137,17 @@ def estimator():
         client_data_list_Premium[27:30]=[0, 1, 0]
             
         client_data_list_Option=estimate.copy()
-           
+        
+        # Establish predicted fees using model        
         index1 = model.predict([client_data_list_Basic])
         index2 = model.predict([client_data_list_Standard])
         index3 = model.predict([client_data_list_Premium])
         index4 = model.predict([client_data_list_Option])
         
         # response = jsonify(f"Predicted Insurance Basic: {index1}, Predicted Insurance Standard: {index2}, Predicted Insurance Premium:{index3}")
-        client_insurance = client(insurance_basic=index1, insurance_standard=index2, insurance_premium=index3, insurance_option=index4)
+        
+        #Establish data to be uploaded into sqlite DB
+        client_insurance = client(insurance_age = client_age, insurance_bmi = bmi, insurance_children_no = children_no, insurance_gender = gender, insurance_smoker = smoker, insurance_region = region, insurance_medical_history = medical_history, insurance_family_medical_history = family_medical_history, insurance_exercise_frequency = exercise_frequency, insurance_occupation = occupation, insurance_coverage_level = coverage_level, insurance_basic=index1, insurance_standard=index2, insurance_premium=index3, insurance_option=index4)
 
         db.session.add(client_insurance)
         db.session.commit()
@@ -150,6 +169,7 @@ def analysis():
     insurance_option = [result[3] for result in insurance_results]
     data_length = len(insurance_results)-1
 
+    #Identify last row of data
     insurance_data = [{'Basic': insurance_basic[data_length], 'Standard': insurance_standard[data_length], 'Premium': insurance_premium[data_length], 'Client_option': insurance_option[data_length]}]
     response = jsonify(insurance_data)
 
@@ -157,6 +177,19 @@ def analysis():
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
+@app.route("/analytics")
+def analytics():
+    region_analytics = db.session.query(client.insurance_region).all()
+
+    reg_ana = [result[0] for result in region_analytics]
+
+    reg_ana_list = [{'regions': reg_ana}]
+
+    response_reg = jsonify(reg_ana_list)
+    # jsonify(f"Predicted Insurance Basic: {response[0]}, Predicted Insurance Standard: {response[1]}, Predicted Insurance Premium:{response[2]}")
+    response_reg.headers.add('Access-Control-Allow-Origin', '*')
+    return response_reg
+
 if __name__ == '__main__':
-  app.run()
+  app.run(debug = True)
   
