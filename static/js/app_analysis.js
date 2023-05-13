@@ -10,8 +10,6 @@ d3.json(url).then (function(response){
           let ClientValue = [response[0].Client_option]
           console.log(ClientValue)
 
-          document.getElementById("Predict").innerHTML = 'You choose '+ client_cover + 'The estimate insurance price is ' + ClientValue + ' per year.';
-
           // chart init
           let xValue = ['Basic', 'Standard', 'Premium'];
         
@@ -30,9 +28,11 @@ d3.json(url).then (function(response){
               console.log(client_cover)
             }
           }
-          
-          document.getElementById("Predict").innerHTML = 'You choose '+ client_cover + 
-                                  'The estimate insurance price is ' + ClientValue + ' per year.';
+
+          client_cover_int = Math.ceil(ClientValue)
+
+          document.getElementById("Predict").innerHTML = '<p>Thank you to consider <b>'+ client_cover + '</b> cover.<br>' +
+                                                        'The estimate insurance price is <br><b>USA$' + client_cover_int + '</b> per year.</p>';
 
           // Create a trace for the bar chart
           let trace = {
