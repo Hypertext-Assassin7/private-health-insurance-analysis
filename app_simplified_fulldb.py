@@ -9,7 +9,8 @@ from flask import (
     render_template,
     jsonify,
     request,
-    redirect)
+    redirect,
+    url_for)
 
 # Flask setup
 app = Flask(__name__, static_url_path='/static')
@@ -19,6 +20,7 @@ app = Flask(__name__, static_url_path='/static')
 #################################################
 
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func
 # 'or' allows us to later switch from 'sqlite' to an external database like 'postgres' easily
 # os.environ is used to access 'environment variables' from the operating system
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', '') or "sqlite:///db.sqlite"
@@ -179,16 +181,40 @@ def analysis():
 
 @app.route("/analytics")
 def analytics():
-    region_analytics = db.session.query(client.insurance_region).all()
+    # region_analytics = db.session.query(client.insurance_region, client.insurance_age, client.insurance_bmi, client.insurance_exercise_frequency, client.insurance_occupation, client.insurance_smoker, client.insurance_coverage_level).all()
+    regions = db.session.query(client.insurance_region, func.count(client.insurance_region)).group_by(client.insurance_region).all()
+    excercise = db.session.query(client.insurance_exercise_frequency, func.count(client.insurance_exercise_frequency)).group_by(client.insurance_exercise_frequency).all()
+    
+    reg_ana = [result[0] for result in regions]
+    reg_count = [result[1] for result in regions]
 
-    reg_ana = [result[0] for result in region_analytics]
+    exe_ana = [result[0] for result in excercise]
+    exe_count = [result[1] for result in excercise]
 
-    reg_ana_list = [{'regions': reg_ana}]
+   #  excercise_ana = [result[3] for result in region_analytics]
+    reg_ana_list = []
+    exe_ana_list = []
+
+    for i in range(len(regions)):
+        reg_ana_list.append({'regions': reg_ana[i], 'reg_number': reg_count[i]})
+
+    for i in range(len(excercise)):
+        exe_ana_list.append({'exercise': exe_ana[i], 'exe_number': exe_count[i]})
 
     response_reg = jsonify(reg_ana_list)
-    # jsonify(f"Predicted Insurance Basic: {response[0]}, Predicted Insurance Standard: {response[1]}, Predicted Insurance Premium:{response[2]}")
     response_reg.headers.add('Access-Control-Allow-Origin', '*')
+
+    response_exe = jsonify(exe_ana_list)
+    response_exe.headers.add('Access-Control-Allow-Origin', '*')
+
+    # jsonify(f"Predicted Insurance Basic: {response[0]}, Predicted Insurance Standard: {response[1]}, Predicted Insurance Premium:{response[2]}")
+    # Combine the two responses into a single response object
+
     return response_reg
+
+@app.route("/management")
+def management():
+    return render_template("internal_analysis.html")
 
 if __name__ == '__main__':
   app.run(debug = True)
