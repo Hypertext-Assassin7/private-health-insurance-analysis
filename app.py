@@ -181,11 +181,14 @@ def analysis():
 
 @app.route("/analytics")
 def analytics():
-    # region_analytics = db.session.query(client.insurance_region, client.insurance_age, client.insurance_bmi, client.insurance_exercise_frequency, client.insurance_occupation, client.insurance_smoker, client.insurance_coverage_level).all()
+    
+    # group by and count features and ready for xValue and yValue to do plots
     regions = db.session.query(client.insurance_region, func.count(client.insurance_region)).group_by(client.insurance_region).all()
     excercise = db.session.query(client.insurance_exercise_frequency, func.count(client.insurance_exercise_frequency)).group_by(client.insurance_exercise_frequency).all()
-    # reg_ana = [result[0] for result in regions]
-    # reg_count = [result[1] for result in regions]
+    smoker = db.session.query(client.insurance_smoker, func.count(client.insurance_smoker)).group_by(client.insurance_gender, client.insurance_smoker).all()
+    occupation = db.session.query(client.insurance_occupation, func.count(client.insurance_occupation)).group_by(client.insurance_gender, client.insurance_occupation).all()
+    # medical = db.session.query(client.insurance_medical_history, func.count(client.insurance_medical_history)).groupy_by(client.insurance_medical_history).all()
+    # medical_family = db.session.query(client.insurance_family_medical_history, func.count(client.insurance_family_medical_history)).groupy_by(client.insurance_family_medical_history).all()
 
     reg_ana_x = [result[0] for result in regions]
     reg_ana_y = [result[1] for result in regions]
@@ -193,15 +196,21 @@ def analytics():
     exe_ana_x = [result[0] for result in excercise]
     exe_count_y = [result[1] for result in excercise]
 
-    reg_ana_list = [{'regions': reg_ana_x}, {"count": reg_ana_y}, {'exercise': exe_ana_x}, {'exe_count':exe_count_y}]
+    smoker_x = [result[0] for result in smoker]
+    smoker_y = [result[1] for result in smoker]
+
+    occupation_x = [result[0] for result in occupation]
+    occupation_y = [result[1] for result in occupation]
+
+    # medical_x = [result[0] for result in medical]
+    # medical_y = [result[1] for result in medical]
+
+    # family_medical_x = [result[0] for result in medical_family]
+    # family_medical_y = [result[1] for result in medical_family]
+
+    reg_ana_list = [{'regions': reg_ana_x}, {"count": reg_ana_y}, {'exercise': exe_ana_x}, {'exe_count':exe_count_y}, {'smoker': smoker_x}, {'smoker_count': smoker_y}, {'occupation': occupation_x}, {'occupation_count': occupation_y}]
     response_reg = jsonify(reg_ana_list)
 
-    # reg_ana_list = []
-
-    # for i in range(len(regions)):
-        # reg_ana_list.append({'regions': reg_ana[i], 'reg_number': reg_count[i]})
-
-    # response_reg = jsonify(reg_ana_list)
     response_reg.headers.add('Access-Control-Allow-Origin', '*')
 
     return response_reg
