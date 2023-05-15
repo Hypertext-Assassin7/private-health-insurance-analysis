@@ -29,8 +29,9 @@ d3.json(url).then (function(response){
             }
           }
 
-          document.getElementById("Predict").innerHTML = '<p>Thank you to consider <b>'+ client_cover + '</b> cover.<br>' +
-                                                        'The estimate insurance price is <br><b>USA$' + ClientValue + '</b> per week.</p>';
+          document.getElementById("Predict").innerHTML = '<p>By selecting the <b>'+ client_cover + '</b> Option,<br>' +
+                                                        'the estimated cost for this choice will be <br>' +
+                                                        '<b>USA$' + ClientValue + '</b> per week.</p>';
 
           // Create a trace for the bar chart
           let trace = {
