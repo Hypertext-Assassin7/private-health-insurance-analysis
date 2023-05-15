@@ -28,15 +28,42 @@ d3.json(url_1).then (function(response_reg){
     let y_med1 = [response_reg[9].medical_count[0], response_reg[9].medical_count[1],response_reg[9].medical_count[2], response_reg[9].medical_count[3]]
     let y_med2 = [response_reg[11].family_medical_count[0], response_reg[11].family_medical_count[1],response_reg[11].family_medical_count[2], response_reg[11].family_medical_count[3]]
 
-    console.log('smoker', xValue1, xValue2, yValue1, yValue2)
+    console.log('medical', y_med1, y_med2)
           
     piechart("regions",values,labels)
     piechart("exercise",values_exe,labels_exe)
     barchart("smoker", xValue1,yValue1,xValue2,yValue2)
     barchart("occupation", x_occ1,y_occ1,x_occ2,y_occ2)
-    stackchart(y_med1, y_med2)
-    
-});
+
+    /* stacked bar chart function */
+  const ctx = document.getElementById('medical');
+  new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Diabetes', 'Heart disease', 'High blood pressure', 'None'],
+        datasets: [
+          {
+            label: 'Medical History',
+            data: y_med1,
+          },
+          {
+            label: 'Family Medical History',
+            data: y_med2,
+          },
+        ],
+      },
+      options: {
+        scales: {
+          x: {
+            stacked: true,
+          },
+          y: {
+            stacked: true,
+          },
+        },
+      },
+    });
+})
 
 /* donut pie chart function */
 function piechart(html_id, values,labels) {
@@ -68,7 +95,7 @@ function piechart(html_id, values,labels) {
     showlegend: true,
     grid: {rows: 1, columns: 1}
     };
-    Plotly.newPlot(html_id, data, layout);}
+    Plotly.newPlot(html_id, data, layout)}
 
 /* grouped bar chart function*/
 function barchart(html_id, x1, y1, x2, y2) {
@@ -95,48 +122,4 @@ function barchart(html_id, x1, y1, x2, y2) {
     width: 600,
   };
   
-  Plotly.newPlot(html_id, data, layout);}
-
-/* stacked bar chart function */
-function stackchart(y1, y2) {
-
-  const ctx = document.getElementById('medical');
-  new chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: ['Diabetes', 'Heart disease', 'High blood pressure', 'None'],
-        datasets: [
-          {
-            label: 'Medical History',
-            data: y1,
-            backgroundColor: Utils.CHART_COLORS.red,
-          },
-          {
-            label: 'Family Medical History',
-            data: y2,
-            backgroundColor: Utils.CHART_COLORS.blue,
-          },
-        ],
-        options: {
-          plugins: {
-            title: {
-              display: true,
-              text: 'Overall Medical History'
-          },
-          },
-          responsive: true,
-          interaction: {
-            intersect: false,
-          },
-          scales: {
-            x: {
-             stacked: true,
-            },
-            y: {
-              stacked: true
-            }
-          }
-        }
-      }
-  })
-}  
+  Plotly.newPlot(html_id, data, layout)}
