@@ -6,7 +6,8 @@ const url_1 = "http://127.0.0.1:5000/analytics";
 d3.json(url_1).then (function(response_reg){
     
     console.log(response_reg)
-        
+
+    /* set up various for x, y values for pie and bar charts to demostrate breakdown of "region","exercise", "smoker", "occupation" */    
     let labels = response_reg[0].regions
     let values = response_reg[1].count
     let labels_exe = response_reg[2].exercise
@@ -20,12 +21,17 @@ d3.json(url_1).then (function(response_reg){
     let y_occ1 = [response_reg[7].occupation_count[0], response_reg[7].occupation_count[1],response_reg[7].occupation_count[2], response_reg[7].occupation_count[3]]
     let y_occ2 = [response_reg[7].occupation_count[4], response_reg[7].occupation_count[5],response_reg[7].occupation_count[6], response_reg[7].occupation_count[7]]
 
+    //let _occ1 = [response_reg[7].occupation_count[0], response_reg[7].occupation_count[1],response_reg[7].occupation_count[2], response_reg[7].occupation_count[3]]
+    //let y_occ2 = [response_reg[7].occupation_count[4], response_reg[7].occupation_count[5],response_reg[7].occupation_count[6], response_reg[7].occupation_count[7]]
+
     console.log('smoker', xValue1, xValue2, yValue1, yValue2)
           
     piechart("regions",values,labels)
     piechart("exercise",values_exe,labels_exe)
     barchart("smoker", xValue1,yValue1,xValue2,yValue2)
     barchart("occupation", x_occ1,y_occ1,x_occ2,y_occ2)
+
+    const ctx = document.getElementById('medical');
 });
 
 /* donut pie chart function */
@@ -86,3 +92,45 @@ function barchart(html_id, x1, y1, x2, y2) {
   };
   
   Plotly.newPlot(html_id, data, layout);}
+
+/* stacked bar chart function */
+function stackchart(y1, y2) {
+  new chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Diabetes', 'Heart disease', 'High blood pressure', 'None'],
+        datasets: [
+          {
+            label: 'Medical History',
+            data: y1,
+            backgroundColor: Utils.CHART_COLORS.red,
+          },
+          {
+            label: 'Family Medical History',
+            data: y2,
+            backgroundColor: Utils.CHART_COLORS.blue,
+          },
+        ],
+        options: {
+          plugins: {
+            title: {
+              display: true,
+              text: 'Overall Medical History'
+          },
+          },
+          responsive: true,
+          interaction: {
+            intersect: false,
+          },
+          scales: {
+            x: {
+             stacked: true,
+            },
+            y: {
+              stacked: true
+            }
+          }
+        }
+      }
+  })
+}  

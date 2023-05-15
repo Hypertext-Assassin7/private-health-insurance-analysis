@@ -188,7 +188,10 @@ def analytics():
     smoker = db.session.query(client.insurance_smoker, func.count(client.insurance_smoker)).group_by(client.insurance_gender, client.insurance_smoker).all()
     occupation = db.session.query(client.insurance_occupation, func.count(client.insurance_occupation)).group_by(client.insurance_gender, client.insurance_occupation).all()
     # medical = db.session.query(client.insurance_medical_history, func.count(client.insurance_medical_history)).groupy_by(client.insurance_medical_history).all()
-    # medical_family = db.session.query(client.insurance_family_medical_history, func.count(client.insurance_family_medical_history)).groupy_by(client.insurance_family_medical_history).all()
+    # family_medical = db.session.query(client.insurance_family_medical_history, func.count(client.insurance_family_medical_history)).groupy_by(client.insurance_family_medical_history).all()
+
+    medical = db.session.query(client.insurance_medical_history, func.count(client.insurance_medical_history)).group_by(client.insurance_medical_history).all()
+    family_medical = db.session.query(client.insurance_family_medical_history, func.count(client.insurance_family_medical_history)).group_by(client.insurance_family_medical_history).all()
 
     reg_ana_x = [result[0] for result in regions]
     reg_ana_y = [result[1] for result in regions]
@@ -202,13 +205,13 @@ def analytics():
     occupation_x = [result[0] for result in occupation]
     occupation_y = [result[1] for result in occupation]
 
-    # medical_x = [result[0] for result in medical]
-    # medical_y = [result[1] for result in medical]
+    medical_x = [result[0] for result in medical]
+    medical_y = [result[1] for result in medical]
 
-    # family_medical_x = [result[0] for result in medical_family]
-    # family_medical_y = [result[1] for result in medical_family]
+    family_medical_x = [result[0] for result in family_medical]
+    family_medical_y = [result[1] for result in family_medical]
 
-    reg_ana_list = [{'regions': reg_ana_x}, {"count": reg_ana_y}, {'exercise': exe_ana_x}, {'exe_count':exe_count_y}, {'smoker': smoker_x}, {'smoker_count': smoker_y}, {'occupation': occupation_x}, {'occupation_count': occupation_y}]
+    reg_ana_list = [{'regions': reg_ana_x}, {"count": reg_ana_y}, {'exercise': exe_ana_x}, {'exe_count':exe_count_y}, {'smoker': smoker_x}, {'smoker_count': smoker_y}, {'occupation': occupation_x}, {'occupation_count': occupation_y}, {'medical_history': medical_x}, {'medical_count': medical_y}, {'family_medical_history': family_medical_x}, {'family_medical_count': family_medical_y}]
     response_reg = jsonify(reg_ana_list)
 
     response_reg.headers.add('Access-Control-Allow-Origin', '*')
@@ -218,6 +221,10 @@ def analytics():
 @app.route("/management")
 def management():
     return render_template("internal_analysis.html")
+
+@app.route("/password")
+def password():
+    return render_template("password.html")
 
 if __name__ == '__main__':
   app.run(debug = True)
