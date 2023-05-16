@@ -1,0 +1,10 @@
+flask
+flask-sqlalchemy
+sqlalchemy
+pandas
+scikit-learn
+joblib
+json
+numpy
+sklearn
+tensorflow
